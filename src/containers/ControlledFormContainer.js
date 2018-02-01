@@ -1,49 +1,68 @@
-import React, {Component} from 'react'
-import ControlledForm from '../components/ControlledForm'
+import React, { Component } from "react";
+import ControlledForm from "../components/ControlledForm";
+import { validateForm } from "../helpers";
+var timeout = null;
 
 class ControlledFormContainer extends Component {
-  constructor() {
-    super()
-    this.state = {
-      success: false,
-      errors: {},
-      exampleEmail: '',
-      examplePassword: '',
-      exampleURL: '',
-    }
-  }
+	constructor() {
+		super();
+		this.state = {
+			success: false,
+			errors: {},
+			exampleEmail: "",
+			examplePassword: "",
+			exampleURL: ""
+		};
+	}
 
-  onChangeInput = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    })
-  }
+	onChangeInput = e => {
+		clearTimeout(timeout);
 
-  onSubmit = (e) => {
-    e.preventDefault()
-    console.log(this.state)
-    this.formSuccess()
-  }
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+		const errors = validateForm(this.state);
+		if (errors) {
+			this.setState({ errors: { [e.target.name]: errors[e.target.name] } });
+		}
+	};
 
-  formSuccess = () => {
-    this.setState({
-      success: true,
-      errors: {},
-      exampleEmail: '',
-      examplePassword: '',
-      exampleURL: '',
-    }, () => console.log('Success!'))
-  }
+	onSubmit = e => {
+		e.preventDefault();
+		console.log(this.state);
+		console.log(e.target);
+		const errors = validateForm(this.state);
 
-  render() {
-    return (
-      <ControlledForm
-        onSubmit={this.onSubmit}
-        onChangeInput={this.onChangeInput}
-        {...this.state}
-      />
-    )
-  }
+		if (errors) {
+			this.setState({ errors });
+		} else {
+			console.log();
+			this.formSuccess();
+		}
+	};
+
+	formSuccess = () => {
+		this.setState(
+			{
+				success: true,
+				errors: {},
+				exampleEmail: "",
+				examplePassword: "",
+				exampleURL: ""
+			},
+			() => console.log("Success!")
+		);
+	};
+
+	render() {
+		return (
+			<ControlledForm
+				onSubmit={this.onSubmit}
+				onChangeInput={this.onChangeInput}
+				{...this.state}
+			/>
+		);
+	}
 }
 
-export default ControlledFormContainer
+export default ControlledFormContainer;
